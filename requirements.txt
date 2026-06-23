@@ -1,0 +1,4 @@
+yfinance
+pykrx
+requests
+deep-translator
