@@ -1,0 +1,51 @@
+name: 포트폴리오 자동 브리핑
+
+on:
+  schedule:
+    # 🌅 모닝 브리핑: 오전 7시 KST = 전날 22:00 UTC (평일)
+    - cron: '0 22 * * 0-4'
+    # 📊 마감 브리핑: 오후 4시 KST = 07:00 UTC (평일)
+    - cron: '0 7 * * 1-5'
+  workflow_dispatch:   # 수동 실행 버튼
+    inputs:
+      briefing_type:
+        description: '브리핑 종류 (morning / evening)'
+        required: true
+        default: 'evening'
+
+jobs:
+  briefing:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Python 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 패키지 설치
+        run: pip install -r requirements.txt
+
+      - name: 브리핑 종류 결정
+        id: type
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "BRIEFING_TYPE=${{ github.event.inputs.briefing_type }}" >> $GITHUB_ENV
+          elif [ "$(date -u +%H)" = "22" ]; then
+            echo "BRIEFING_TYPE=morning" >> $GITHUB_ENV
+          else
+            echo "BRIEFING_TYPE=evening" >> $GITHUB_ENV
+          fi
+
+      - name: 브리핑 실행
+        env:
+          NAVER_CLIENT_ID:      ${{ secrets.NAVER_CLIENT_ID }}
+          NAVER_CLIENT_SECRET:  ${{ secrets.NAVER_CLIENT_SECRET }}
+          GMAIL_ADDRESS:        ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD:   ${{ secrets.GMAIL_APP_PASSWORD }}
+          KAKAO_REST_API_KEY:   ${{ secrets.KAKAO_REST_API_KEY }}
+          KAKAO_REFRESH_TOKEN:  ${{ secrets.KAKAO_REFRESH_TOKEN }}
+        run: python portfolio_briefing.py
