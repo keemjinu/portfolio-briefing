@@ -47,5 +47,6 @@ jobs:
           GMAIL_ADDRESS:        ${{ secrets.GMAIL_ADDRESS }}
           GMAIL_APP_PASSWORD:   ${{ secrets.GMAIL_APP_PASSWORD }}
           KAKAO_REST_API_KEY:   ${{ secrets.KAKAO_REST_API_KEY }}
+          KAKAO_CLIENT_SECRET:   ${{ secrets.KAKAO_CLIENT_SECRET }}
           KAKAO_REFRESH_TOKEN:  ${{ secrets.KAKAO_REFRESH_TOKEN }}
         run: python portfolio_briefing.py
