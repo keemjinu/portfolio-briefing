@@ -22,6 +22,7 @@ NAVER_SECRET   = os.environ["NAVER_CLIENT_SECRET"]
 GMAIL_ADDRESS  = os.environ["GMAIL_ADDRESS"]
 GMAIL_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
 KAKAO_API_KEY  = os.environ["KAKAO_REST_API_KEY"]
+KAKAO_SECRET   = os.environ.get("KAKAO_CLIENT_SECRET", "")
 KAKAO_REFRESH  = os.environ["KAKAO_REFRESH_TOKEN"]
 BRIEFING_TYPE  = os.environ.get("BRIEFING_TYPE", "evening")  # morning | evening
 
@@ -133,13 +134,16 @@ def get_us_news(ticker):
 
 # ── 카카오 토큰 갱신 ──────────────────────────────────────
 def get_kakao_access_token():
+    payload = {
+        "grant_type":    "refresh_token",
+        "client_id":     KAKAO_API_KEY,
+        "refresh_token": KAKAO_REFRESH,
+    }
+    if KAKAO_SECRET:
+        payload["client_secret"] = KAKAO_SECRET
     res = requests.post(
         "https://kauth.kakao.com/oauth/token",
-        data={
-            "grant_type":    "refresh_token",
-            "client_id":     KAKAO_API_KEY,
-            "refresh_token": KAKAO_REFRESH,
-        },
+        data=payload,
         timeout=10
     )
     return res.json().get("access_token")
